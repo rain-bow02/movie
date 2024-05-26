@@ -5,7 +5,7 @@ export const login = (user) =>
   request({
     method: "POST",
     url: "/user/login",
-    data: {
+    params: {
       name: user.username,
       password: user.password,
     },
