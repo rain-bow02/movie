@@ -36,7 +36,10 @@
 
 <script setup name="Login" lang="ts">
 import { reactive } from "vue";
-
+import axios from "axios";
+import { useRouter } from "vue-router";
+import { login } from "../../api/user";
+const router = useRouter();
 interface FormState {
   username: string;
   password: string;
@@ -50,6 +53,34 @@ const formState = reactive<FormState>({
 });
 const onFinish = (values: any) => {
   console.log("Success:", values);
+  login(formState)
+    .then((resp) => {
+      //resp:后端传回的接口
+      console.log("resppppppp", resp);
+      let user = resp.data;
+      let status = resp.data.code;
+      // console.log("用户",user)
+      // console.log("水水水水水水水",status)
+      console.log("用户", user);
+      console.log("用户的id", user.data.id);
+      if (status == 200) {
+        localStorage.setItem("user", JSON.stringify(user.data));
+        const userInfo = JSON.parse(localStorage.getItem("user"));
+        const username = userInfo.name;
+        const userid = userInfo.id;
+        console.log(username);
+        router.push({
+          name: "dishes",
+        });
+        console.log(user.data.id);
+      } else {
+        alert(resp.data.msg);
+      }
+    })
+    .catch((error) => {
+      alert(error);
+      alert("与服务器连接异常");
+    });
 };
 
 const onFinishFailed = (errorInfo: any) => {
