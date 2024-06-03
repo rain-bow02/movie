@@ -1,38 +1,27 @@
 <template>
   <div>
-    <!-- <a-space style="width: 100%; padding-left: 12px">
-      <a-button @click="add">新增电影</a-button>
-    </a-space> -->
+    <a-space style="width: 100%; padding-left: 12px">
+      <a-button @click="add">新增角色</a-button>
+    </a-space>
     <!-- 搜索按钮 -->
-    <van-search
-      v-model="searchValue"
-      show-action
-      placeholder="请输入搜索关键词"
-    >
-      <template #action>
-        <div @click="onSearchMovies()">搜索</div>
-      </template>
-    </van-search>
+
     <!-- 分类宫格 -->
-    <van-tabs @click-tab="typeChange">
-      <van-tab
-        v-for="type in types"
-        :key="type.id"
-        :title="type.name"
-        :name="type.id"
-      >
-      </van-tab>
-    </van-tabs>
+
     <a-row :gutter="[60, 24]" style="margin: 5px -30px 10px -16px">
-      <a-col :span="6" v-for="movie in movies" :key="movie.id">
-        <a-card hoverable style="width: auto" @click="jumpToMovieDetail(movie)">
-          <template #cover>
-            <img
-              alt="example"
-              :src="
-                '	http://localhost:5173/src/poster/' + movie.imdb_id + '.jpg'
-              "
-            />
+      <a-col :span="6" v-for="movie in roles" :key="movie.id">
+        <a-card hoverable style="width: auto">
+          <template #actions>
+            <icon-font type="icon-chakan" @click.stop="show(movie)" />
+            <icon-font type="icon-bianji" @click.stop="edit(movie)" />
+            <a-popconfirm
+              title="是否确定删除?"
+              ok-text="Yes"
+              cancel-text="No"
+              @confirm="deleteById(movie.id)"
+              @cancel="cancel"
+            >
+              <icon-font type="icon-shanchu" />
+            </a-popconfirm>
           </template>
           <a-card-meta class="ellipsis">
             <template #title>
@@ -77,15 +66,8 @@ import { watch } from "vue";
 
 import { useRouter } from "vue-router";
 
-import {
-  getAllMovies,
-  getMoviesByType,
-  getSearchMovies,
-  deleteMovie,
-  getSimilarMovies,
-  idInfo,
-} from "../../api/movies";
-import { saveViewRecord } from "../../api/viewRecord";
+import { getAllRole } from "../../../api/role";
+import { saveViewRecord } from "../../../api/viewRecord";
 import { ref, onMounted } from "vue";
 // import { getImageUrl } from "../../utils/funtion";
 import Save from "./save.vue";
@@ -95,7 +77,7 @@ const router = useRouter();
 let searchValue = ref("");
 const currentPage = ref(1);
 const total = ref(1);
-const movies = ref([]);
+const roles = ref([]);
 const visible = ref(false);
 const currentData = ref({});
 const type = ref("add");
@@ -127,26 +109,6 @@ const types = [
   { id: 23, name: "惊悚" },
   { id: 24, name: "西方" },
 ];
-const onSearchMovies = () => {
-  getSearchMovies(searchValue.value, currentPage.value).then((resp) => {
-    movies.value = resp.data;
-    total.value = resp.total;
-    console.log("搜索成功");
-  });
-};
-const typeChange = (index) => {
-  console.log(index);
-  if (index.name != 0) {
-    getMoviesByType(index.name, currentPage.value)
-      .then((resp) => {
-        console.log(index.name);
-        movies.value = resp.data;
-      })
-      .catch((err) => {});
-  } else {
-    getAll(currentPage.value);
-  }
-};
 const onChangePage = (pageNumber: number) => {
   currentPage.value = pageNumber;
 };
@@ -213,9 +175,9 @@ const onSave = () => {
 //   router.push({ name: "dishesDetail", params: { movie: data } });
 // };
 const getAll = (page: number) => {
-  getAllMovies(page).then((resp) => {
+  getAllRole(page).then((resp) => {
     console.log(resp);
-    movies.value = resp.data;
+    roles.value = resp.data;
     total.value = resp.total;
   });
 };

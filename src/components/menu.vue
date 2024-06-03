@@ -5,35 +5,47 @@
         <router-link to="movies">热门电影</router-link>
       </a-menu-item>
 
-      <a-menu-item :key="'/MoButton'">
-        <router-link to="MoButton">推荐电影</router-link>
+      <a-menu-item :key="'/recommend'">
+        <router-link to="recommend">推荐电影</router-link>
       </a-menu-item>
 
-      <a-sub-menu :key="'/Icon'" title="用户记录">
-        <a-menu-item :key="'/Letter'">
-          <router-link to="Letter">收藏记录</router-link>
+      <a-sub-menu :key="'/Icon'" title="用户中心">
+        <a-menu-item :key="'/personal'">
+          <router-link to="personal">个人中心</router-link>
+        </a-menu-item>
+        <a-menu-item :key="'/stars'">
+          <router-link to="stars">收藏记录</router-link>
         </a-menu-item>
 
-        <a-menu-item :key="'/MoButton'">
-          <router-link to="MoButton">浏览记录</router-link>
+        <a-menu-item :key="'/viewRecord'">
+          <router-link to="viewRecord">浏览记录</router-link>
         </a-menu-item>
 
-        <a-menu-item :key="'/MoButton'">
-          <router-link to="MoButton">评价记录</router-link>
+        <a-menu-item :key="'/rating'">
+          <router-link to="rating">评价记录</router-link>
         </a-menu-item>
       </a-sub-menu>
 
-      <a-menu-item :key="'/Breadcrumb'">
-        <router-link to="Breadcrumb">面包屑</router-link>
-      </a-menu-item>
+      <a-sub-menu :key="'/system'" title="系统管理">
+        <a-menu-item :key="'/user'">
+          <router-link to="user">用户管理</router-link>
+        </a-menu-item>
+        <a-menu-item :key="'/role'">
+          <router-link to="role">角色管理</router-link>
+        </a-menu-item>
+        <a-menu-item :key="'/permission'">
+          <router-link to="permission">角色权限管理</router-link>
+        </a-menu-item>
+      </a-sub-menu>
 
-      <a-menu-item :key="'/Dropdown'">
-        <router-link to="Dropdown">下拉菜单</router-link>
-      </a-menu-item>
-
-      <a-menu-item :key="'/Steps'">
-        <router-link to="Steps">步骤条</router-link>
-      </a-menu-item>
+      <a-sub-menu :key="'/movie'" title="电影信息管理">
+        <a-menu-item :key="'/movieManager'">
+          <router-link to="movieManager">电影管理</router-link>
+        </a-menu-item>
+        <a-menu-item :key="'/movieTypeManager'">
+          <router-link to="movieTypeManager">电影类别管理</router-link>
+        </a-menu-item>
+      </a-sub-menu>
     </a-menu>
   </div>
 </template>

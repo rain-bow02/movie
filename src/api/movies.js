@@ -12,53 +12,66 @@ export const getAllMovies = (page) =>
   });
 
 //根据类型查找菜品、
-export const getMoviesByType = (id) =>
+export const getMoviesByType = (id, page) =>
   request({
     // url:API.API_STORE_SEARCH+"/"+id
-    url: API.API_Movies_BY_TYPE + "/" + id,
+    url: "/movies/inTypeMovies" + "/" + id,
+    method: "GET",
+    params: {
+      page: page,
+    },
   });
 
 //推荐
 export const getRecommend = (id) =>
   request({
     // url:API.API_STORE_SEARCH+"/"+id
-    url: API.API_RECOMMEND + "/" + id,
+    url: "/movies/recommend" + "/" + id,
   });
-export const getSearchMovies = (searchValue) =>
+export const getSearchMovies = (searchValue, page) =>
   request({
     // url:API.API_STORE_SEARCH+"/"+id
-    url: API.API_GET_SEARCH_MOVIES + "/" + searchValue,
+    url: "/movies/search" + "/" + searchValue,
     method: "GET",
-    data: {
-      searchValue,
+    params: {
+      page: page,
     },
   });
-  //删除电影
+
+//删除电影
 export const deleteMovie = (id) =>
   request({
-    url:  "/movies/delete" + "/" + id,
-      method: 'POST',
+    url: "/movies/delete" + "/" + id,
+    method: "POST",
   });
-  //新增电影
+//新增电影
 export const addMovie = (movie) =>
   request({
-    url:  "/movies/add" ,
-      method: 'POST',
-      data:movie,
+    url: "/movies/add",
+    method: "POST",
+    data: movie,
   });
-    //修改电影
-export const updateMovie = (id,movie) =>
+//修改电影
+export const updateMovie = (id, movie) =>
   request({
-    url:  "/movies/update"  + "/" + id,
-      method: 'POST',
-      data:movie,
+    url: "/movies/update" + "/" + id,
+    method: "POST",
+    data: movie,
   });
-    //相似电影
+//相似电影
 export const getSimilarMovies = (id) =>
   request({
-    url:  "/movies/similar"  + "/" + id,
-      method: 'POST',
+    url: "/movies/similar" + "/" + id,
+    method: "POST",
   });
+
+//删除电影
+export const idInfo = (id) =>
+  request({
+    url: "/movies/idInfo" + "/" + id,
+    method: "POST",
+  });
+
 // //展示所有电影
 // movies / all;
 // //分类查询电影

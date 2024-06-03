@@ -54,7 +54,7 @@
 <script lang="ts" setup>
 import { defineProps, reactive, watch, ref } from "vue";
 
-import { addMovie, updateMovie } from "../../api/movies";
+import { addMovie, updateMovie } from "../../../api/movies";
 const emits = defineEmits(["save", "close", "updateTree"]);
 
 const formRef = ref<any>();

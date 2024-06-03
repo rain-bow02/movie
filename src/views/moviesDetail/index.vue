@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="display: grid">
     <div class="movie">
       <div class="moviePhoto">
         <img
@@ -23,8 +23,11 @@
         </ul>
 
         <div class="toRate">
-          <button class="btnToRate" v-on:click="jumpToRatePage(movie)">
-            收藏
+          <button
+            class="btnToRate"
+            v-on:click="ifSaved ? deleteStar(movie.id) : saveStar(movie.id)"
+          >
+            {{ ifSaved ? "取消收藏" : "收藏" }}
           </button>
           <button class="btnToRate" v-on:click="jumpToRatePage(movie)">
             去评价
@@ -33,9 +36,7 @@
       </div>
     </div>
     <div class="otherMovies">
-      <div style="text-align: left; margin-bottom: 10px">
-        喜欢这部电影的人也喜欢
-      </div>
+      <div style="text-align: left; margin: 10px 0">喜欢这部电影的人也喜欢</div>
       <a-row :gutter="[60, 24]">
         <a-col :span="4" v-for="m in similarMovies" :key="m.id">
           <a-card hoverable style="width: auto" @click="jumpToMovieDetail(m)">
@@ -67,10 +68,13 @@
   </div>
 </template>
 <script setup lang="ts">
+import { watch } from "vue";
 import { getSimilarMovies } from "../../api/movies";
+import { saveStars, saved, deleteStars } from "../../api/stars";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
+const ifSaved = ref(false);
 const movie = ref({
   id: 1,
   name: "冰糖麒麟西瓜 约4.5斤",
@@ -85,7 +89,7 @@ const movie = ref({
 });
 const similarMovies = ref([]);
 const jumpToRatePage = (data: any) => {
-  router.push({ name: "orderDetail", params: { movie: data } });
+  router.push({ name: "ratePage", params: { movie: data } });
 };
 const getSimilar = (id: number) => {
   getSimilarMovies(id).then((resp) => {
@@ -95,7 +99,7 @@ const getSimilar = (id: number) => {
 const jumpToMovieDetail = async (data: any) => {
   getSimilarMovies(data.id).then((resp) => {
     similarMovies.value = resp;
-    console.log(movie.value);
+    console.log("jumpToMovieDetail", movie.value);
     localStorage.setItem("movie", JSON.stringify(data));
     localStorage.setItem("similarMovies", JSON.stringify(similarMovies.value));
     router.push({
@@ -106,25 +110,49 @@ const jumpToMovieDetail = async (data: any) => {
     similarMovies.value = JSON.parse(localStorage.getItem("similarMovies"));
   });
 };
+const saveStar = (movieId: number) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const data = {
+    movie_id: movieId,
+    user_id: user.id,
+  };
+  saveStars(data);
+  ifSaved.value = !ifSaved.value;
+};
+const deleteStar = (movieId: number) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const data = {
+    movie_id: movieId,
+    user_id: user.id,
+  };
+  deleteStars(data);
+  ifSaved.value = !ifSaved.value;
+};
 onMounted(() => {
   movie.value = JSON.parse(localStorage.getItem("movie"));
   similarMovies.value = JSON.parse(localStorage.getItem("similarMovies"));
-  console.log(similarMovies.value);
+  console.log("onMounted", similarMovies.value);
 });
 
-//  onMounted() {
-//     movie.value = JSON.parse(localStorage.getItem("movie"));
-//     similarMovies.value = JSON.parse(localStorage.getItem("similarMovies"));
-//     //  this.getSimilar(this.movie.id)
-//     //得到菜种类
-//     console.log(similarMovies.value);
-//   }
+watch(
+  () => movie.value,
+  () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const data = {
+      movie_id: movie.value.id,
+      user_id: user.id,
+    };
+    saved(data).then((resp) => {
+      ifSaved.value = resp;
+    });
+  }
+);
 </script>
 <!-- scoped: 作用域，当前css只当前的组件生效-->
 <style lang="less" scoped>
 .movie {
   width: 100%;
-  height: 300px;
+  min-height: 270px;
 }
 .van-card__content {
   min-height: 10px;
@@ -227,7 +255,7 @@ onMounted(() => {
   padding: 10px;
 }
 .toRate {
-  // margin-top: 30px;
+  height: 60px;
 }
 .btnToRate {
   background-color: #1795bb;
@@ -239,7 +267,7 @@ onMounted(() => {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 4px 20px;
+  margin: 2px 20px;
   -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
   cursor: pointer;

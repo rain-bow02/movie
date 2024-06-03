@@ -10,6 +10,35 @@ export const login = (user) =>
       password: user.password,
     },
   });
+// 修改
+export const update = (id, user) =>
+  request({
+    method: "POST",
+    url: "/user/update" + "/" + id,
+    data: user,
+  });
+//删除电影
+export const deleteUser = (id) =>
+  request({
+    url: "/user/delete" + "/" + id,
+    method: "POST",
+  });
+//删除电影
+export const idInfo = (id) =>
+  request({
+    url: "/user/idInfo" + "/" + id,
+    method: "POST",
+  });
+
+//删除电影
+export const getAllUser = (page) =>
+  request({
+    url: "/user/all",
+    method: "GET",
+    params: {
+      page: page,
+    },
+  });
 // user / login;
 // // 注册
 // register;

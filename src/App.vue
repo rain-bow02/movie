@@ -8,6 +8,9 @@
         scriptUrl: '//at.alicdn.com/t/c/font_4035907_o5hxqjo7dq.js',
       }"
     >
+      <div class="back">
+        <router-view name="back" />
+      </div>
       <div class="app">
         <div class="left">
           <router-view name="menu" />
@@ -34,6 +37,9 @@
   display: flex;
   display: flex;
   flex-direction: row-reverse;
+}
+.back {
+  margin-left: 129px;
 }
 .left {
   width: 15%;
