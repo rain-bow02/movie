@@ -1,4 +1,7 @@
 <template>
+  <a-space>
+    <video-camera-outlined />
+  </a-space>
   <a-form
     :model="formState"
     name="basic"
@@ -11,7 +14,7 @@
     <a-form-item
       label="Username"
       name="username"
-      :rules="[{ required: true, message: 'Please input your username!' }]"
+      :rules="[{ validator: validateName }]"
     >
       <a-input v-model:value="formState.username" />
     </a-form-item>
@@ -19,7 +22,7 @@
     <a-form-item
       label="Password"
       name="password"
-      :rules="[{ required: true, message: 'Please input your password!' }]"
+      :rules="[{ validator: validatePassword }]"
     >
       <a-input-password v-model:value="formState.password" />
     </a-form-item>
@@ -82,6 +85,22 @@ const onFinish = (values: any) => {
 
 const onFinishFailed = (errorInfo: any) => {
   console.log("Failed:", errorInfo);
+};
+const validateName = () => {
+  console.log("asdas");
+
+  if (!formState.username) {
+    return Promise.reject("请填写账号");
+  } else {
+    return Promise.resolve();
+  }
+};
+const validatePassword = () => {
+  if (!formState.password) {
+    return Promise.reject("请填写密码");
+  } else {
+    return Promise.resolve();
+  }
 };
 </script>
 <!-- scoped: 作用域，当前css只当前的组件生效-->

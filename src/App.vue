@@ -1,20 +1,53 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
+<script setup></script>
 
 <template>
-  <ConfigProvider
+  <div id="app">
+    <ConfigProvider
       :locale="zhCN"
       :IconConfig="{
-      scriptUrl: '//at.alicdn.com/t/c/font_4035907_o5hxqjo7dq.js'
-    }"
-  >
-    <router-view />
-  </ConfigProvider>
+        scriptUrl: '//at.alicdn.com/t/c/font_4035907_o5hxqjo7dq.js',
+      }"
+    >
+      <div class="app">
+        <div class="left">
+          <router-view name="menu" />
+        </div>
+        <div class="right">
+          <router-view />
+        </div>
+      </div>
+    </ConfigProvider>
+  </div>
 </template>
 
 <style scoped>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  padding: 1rem;
+  max-width: 960px;
+}
+.app {
+  display: flex;
+  display: flex;
+  flex-direction: row-reverse;
+}
+.left {
+  width: 15%;
+  position: fixed; /* 设置固定定位 */
+  top: 0; /* 距离顶部0像素 */
+  left: 0; /* 距离左侧0像素 */
+  background-color: #333; /* 背景颜色 */
+  color: white; /* 文字颜色 */
+  z-index: 1000; /* 确保菜单在其他内容之上 */
+}
+.right {
+  width: 87%;
+  /* float: right; */
+}
 header {
   line-height: 1.5;
 }

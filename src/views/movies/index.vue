@@ -1,5 +1,8 @@
 <template>
   <div>
+    <a-space style="width: 100%">
+      <a-button @click="add">新增电影</a-button>
+    </a-space>
     <!-- 搜索按钮 -->
     <van-search
       v-model="searchValue"
@@ -20,33 +23,93 @@
       >
       </van-tab>
     </van-tabs>
-
-    <!-- 菜品列表 
-      ../../poster/{{ movie.imdb_id }}.jpg-->
-
-    <van-grid :gutter="10" icon-size="94" :column-num="5">
-      <van-grid-item
-        v-for="movie in movies"
-        :key="movie.id"
-        :icon="require('../../poster/' + movie.imdb_id + '.jpg')"
-        :text="movie.name"
-        @click="jumpToMovieDetail(movie)"
+    <a-row :gutter="[60, 24]">
+      <a-col :span="6" v-for="movie in movies" :key="movie.id">
+        <a-card hoverable style="width: auto" @click="jumpToMovieDetail(movie)">
+          <template #cover>
+            <img
+              alt="example"
+              :src="
+                '	http://localhost:5173/src/poster/' + movie.imdb_id + '.jpg'
+              "
+            />
+          </template>
+          <template #actions>
+            <icon-font type="icon-chakan" @click.stop="show(movie)" />
+            <icon-font type="icon-bianji" @click.stop="edit(movie)" />
+            <a-popconfirm
+              title="是否确定删除?"
+              ok-text="Yes"
+              cancel-text="No"
+              @confirm="deleteById(movie.id)"
+              @cancel="cancel"
+            >
+              <icon-font type="icon-shanchu" />
+            </a-popconfirm>
+          </template>
+          <a-card-meta class="ellipsis">
+            <template #title>
+              <div class="ellipsis" style="font-size: 14px">
+                <span :title="movie.name">
+                  {{ movie.name }}
+                </span>
+              </div>
+            </template>
+            <template #description>
+              <div class="ellipsis" style="font-size: 13px">
+                <span :title="movie.intro">
+                  {{ movie.intro }}
+                </span>
+              </div>
+            </template>
+          </a-card-meta>
+        </a-card>
+      </a-col>
+    </a-row>
+    <div>
+      <a-pagination
+        v-model:current="currentPage"
+        show-quick-jumper
+        :total="total"
+        @change="onChangePage"
+        pageSize="20"
       />
-    </van-grid>
-    <a-pagination v-model:current="currentPage" simple :total="totalPage" />
+    </div>
   </div>
+  <Save
+    v-if="visible"
+    :data="currentData"
+    :type="type"
+    @save="onSave"
+    @close="visible = false"
+  />
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { watch } from "vue";
+
+import { useRouter } from "vue-router";
+
 import {
-  getAllMovies,getMoviesByType,getSearchMovies
+  getAllMovies,
+  getMoviesByType,
+  getSearchMovies,
+  deleteMovie,
+  getSimilarMovies,
 } from "../../api/movies";
-let searchValue = "";
-let activeName = "a";
-const typeId = 1;
+import { ref, onMounted } from "vue";
+// import { getImageUrl } from "../../utils/funtion";
+import Save from "./save.vue";
+
+const router = useRouter();
+let searchValue = ref("");
 const currentPage = ref(1);
-const totalPage = ref(1);
-let movies = [];
+const total = ref(1);
+const movies = ref([]);
+const visible = ref(false);
+const currentData = ref({});
+const type = ref("add");
+const similarMovies = ref([]);
 const types = [
   { id: 0, name: "全部" },
   { id: 1, name: "音乐剧" },
@@ -74,112 +137,89 @@ const types = [
   { id: 23, name: "惊悚" },
   { id: 24, name: "西方" },
 ];
-    //加载我们的商品
-    async onLoad() {
-      const { list } = await getSearchMovies(active);
-      movies = [
-        ...movies, //拷贝数组
-        ...list.data,
-      ];
-      loading = false;
-    },
-    //点击后切换type
-    typeChange(id, tittle) {
-      console.log(id, tittle);
-      if (id != 0) {
-        getMoviesByType(id)
-          .then((resp) => {
-            console.log(id);
-            movies = resp;
-          })
-          .catch((err) => {
-            message.error(err.message);
-          });
-      } else {
-        getAllMovies()
-          .then((resp) => {
-            console.log(resp);
-            movies = resp.data;
-          })
-          .catch((err) => {
-             message.error(err.message);
-          });
-      }
-    },
-    //点击搜索按钮进行搜索  回车进行触发该事件
-    onSearch() {
-      onSearchMovies;
-    },
-    onSearchMovies() {
-      getSearchMovies(searchValue).then((resp) => {
-         movies = resp;
-        console.log("搜索成功");
-      });
-    },
-
-    // 查看电影详情
-
-    jumpToMovieDetail(data) {
-      localStorage.setItem("movie", JSON.stringify(data));
-      router.push({ name: "dishesDetail", params: { movie: data } });
-    },
-  async created() {
-    orderList = route.params;
-    // this.getStoresList();
-    getAllMovies(currentPage, currentPage).then((resp) => {
-      console.log(resp);
-      movies = resp.data;
-      totalPage = resp.totalPage;
+const onChangePage = (pageNumber: number) => {
+  currentPage.value = pageNumber;
+};
+const getSimilar = (id) => {
+  getSimilarMovies(id).then((resp) => {
+    similarMovies.value = resp;
+    console.log(similarMovies.value);
+  });
+};
+function getImageUrl(url) {
+  return new URL(url, import.meta.url).href;
+}
+const jumpToMovieDetail = async (data: any) => {
+  getSimilarMovies(data.id).then((resp) => {
+    similarMovies.value = resp;
+    console.log(similarMovies.value);
+    localStorage.setItem("movie", JSON.stringify(data));
+    localStorage.setItem("similarMovies", JSON.stringify(similarMovies.value));
+    router.push({
+      name: "moviesDetail",
+      params: { movie: data, similarMovies: similarMovies.value },
     });
+  });
+};
+const add = () => {
+  console.log(visible.value);
+  visible.value = true;
+  type.value = "add";
+  currentData.value = {};
+};
+const edit = (mpvie) => {
+  visible.value = true;
+  type.value = "edit";
+  currentData.value = mpvie;
+};
+const show = (mpvie) => {
+  visible.value = true;
+  type.value = "show";
+  currentData.value = mpvie;
+};
+const deleteById = (id) => {
+  console.log("deleteById");
+  deleteMovie(id).then(() => {
+    message.success("删除成功");
+    getAll(currentPage.value);
+  });
+};
+// // 查看电影详情
+
+// const jumpToMovieDetail = (data) => {
+//   localStorage.setItem("movie", JSON.stringify(data));
+//   router.push({ name: "dishesDetail", params: { movie: data } });
+// };
+const getAll = (page: number) => {
+  getAllMovies(page).then((resp) => {
+    console.log(resp);
+    movies.value = resp.data;
+    total.value = resp.total;
+  });
+};
+watch(
+  () => currentPage.value,
+  (value) => {
+    getAll(value);
   },
+  { immediate: true }
+);
 </script>
 <!-- scoped: 作用域，当前css只当前的组件生效-->
 <style lang="less" scoped>
 // 菜品卡片
-.dishes_card {
-  text-align: left;
-  margin: 10px;
-  border-radius: 5px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.van-card__title {
-  font-size: 14px;
-  font-weight: 600;
+.ant-row {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
 }
-.van-card__price {
-  color: crimson;
-}
-.van-card__origin-price {
-  margin-left: 5px;
-}
-// 店铺
-.van-card__footer {
-  border-top: 1px solid #ebeef5;
-  text-align: left;
-}
-.shop_card {
-  border-top: 1px solid #ebeef5;
-  text-align: left;
-  margin-top: 10px;
-  padding-bottom: 5px;
-}
-.shop_title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-top: 5px;
-}
-.van-button {
-  float: right;
-  font-size: 10px;
-  padding-left: 5px;
-  padding-right: 5px;
-  height: 20px;
-}
-// .van-search {
-//   background-color: red;
-// }
-.el-button {
-  background-color: red;
+:deep(.ant-card-body) {
+  padding: 15px;
 }
 </style>
 ../../api/movies

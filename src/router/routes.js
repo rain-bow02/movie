@@ -1,3 +1,7 @@
+import Movies from '../views/movies/index.vue'
+import Menu from '../components/menu.vue'
+import MoviesDetail from '../views/moviesDetail/index.vue'
+
 const routes = [
   {
     path: "/",
@@ -14,9 +18,25 @@ const routes = [
   {
     path: "/movies",
     name: "movies",
-    component: () => import("../views/movies/index.vue"),
+    components:{
+            //header: Navbar, //告知该路由头部应该展示那个组件
+            default:Movies,
+            menu:Menu,
+        },
     meta: {
       title: "电影",
+    },
+  },
+  {
+    path: "/moviesDetail",
+    name: "moviesDetail",
+    components:{
+            //header: Navbar, //告知该路由头部应该展示那个组件
+            default:MoviesDetail,
+            menu:Menu,
+        },
+    meta: {
+      title: "电影详情",
     },
   },
 ];

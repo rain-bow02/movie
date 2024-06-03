@@ -1,0 +1,16 @@
+.ant-pagination-prev,
+.ant-pagination-next,
+.ant-pagination-jump-prev,
+.ant-pagination-jump-next {
+    display: inline-table;
+}
+.ant-menu{
+    width: 100%!important;
+}
+.ant-menu-sub.ant-menu-inline>.ant-menu-item,
+.ant-menu-sub.ant-menu-inline>.ant-menu-submenu>.ant-menu-submenu-title {
+   padding-left: 20px!important;
+}
+.ant-menu-sub.ant-menu-inline>.ant-menu-item{
+    padding-left: 35px !important;
+}
